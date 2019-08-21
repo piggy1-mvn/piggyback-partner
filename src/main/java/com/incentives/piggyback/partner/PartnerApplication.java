@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 public class PartnerApplication {
 	
-	@RequestMapping("/partnerHome")
+	@RequestMapping("/")
 	public String home() {
 		return "Hello, from partner service in Docker";
 		
