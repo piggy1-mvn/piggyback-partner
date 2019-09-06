@@ -9,10 +9,15 @@ cache:
     - $HOME/.m2
     - $HOME/.sonar/cache
 
+services:
+  - docker
+
 install:
   skip
 
 script:
+  - travis env set DOCKER_USERNAME $DOCKER_USERNAME
+  - travis env set DOCKER_PASSWORD $DOCKER_PASSWORD
   - mvn clean install sonar:sonar -Dsonar.projectKey=piggy1-mvn_piggyback-partner -Dsonar.organization=piggyback -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN -Djib.to.auth.username=$DOCKER_USERNAME -Djib.to.auth.password=$DOCKER_PASSWORD
 
 after_success:
