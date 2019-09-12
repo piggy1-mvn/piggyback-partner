@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PartnerEventPublisher {
+	
     @Bean
     @ServiceActivator(inputChannel = "pubsubOutputChannel")
     public MessageHandler messageSender(PubSubTemplate pubsubTemplate) {
