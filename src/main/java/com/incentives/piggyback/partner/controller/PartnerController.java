@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.incentives.piggyback.partner.dto.PartnerEntity;
+import com.incentives.piggyback.partner.entity.Partner;
 import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
 import com.incentives.piggyback.partner.service.PartnerService;
 import com.incentives.piggyback.partner.util.CommonUtility;
@@ -32,7 +33,7 @@ public class PartnerController {
 	private PartnerService partnerService;
 
 	@PostMapping
-	public ResponseEntity<RestResponse<PartnerEntity>> createPartner(@RequestBody PartnerEntity partner) {
+	public ResponseEntity<RestResponse<PartnerEntity>> createPartner(@RequestBody Partner partner) {
 		return RestUtils.successResponse(partnerService.createPartner(partner));
 	}
 
@@ -44,7 +45,7 @@ public class PartnerController {
 	
 	@PutMapping
 	public ResponseEntity<RestResponse<PartnerEntity>> updatePartner(
-			@RequestBody PartnerEntity partner) {
+			@RequestBody Partner partner) {
 		return RestUtils.successResponse(partnerService.updatePartner(partner));
 	}
 	
