@@ -16,5 +16,6 @@ public class PartnerOrder {
 	private double timestamp;
 	private String initiatorUserId;
 	private String orderStatus;
+	private double optimizationRadius;
 	private List<String> userIds;
 }

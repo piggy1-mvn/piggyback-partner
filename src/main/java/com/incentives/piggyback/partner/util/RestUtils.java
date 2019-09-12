@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.incentives.piggyback.partner.exception.ExceptionResponseCode;
+import com.incentives.piggyback.partner.util.constants.Constant;
 
 @Component
 public class RestUtils {

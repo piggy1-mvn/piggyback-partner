@@ -1,7 +1,5 @@
 package com.incentives.piggyback.partner.controller;
 
-import java.util.Calendar;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,19 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.incentives.piggyback.partner.dto.PartnerEntity;
 import com.incentives.piggyback.partner.entity.Partner;
-import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
 import com.incentives.piggyback.partner.service.PartnerService;
-import com.incentives.piggyback.partner.util.CommonUtility;
 import com.incentives.piggyback.partner.util.RestResponse;
 import com.incentives.piggyback.partner.util.RestUtils;
-import com.incentives.piggyback.partner.util.constants.Constant;
 
 @RestController
 @RequestMapping("/partner")
 public class PartnerController {
-
-	@Autowired
-	private PartnerEventPublisher.PubsubOutboundGateway messagingGateway;
 
 	@Autowired
 	private PartnerService partnerService;
@@ -53,20 +45,5 @@ public class PartnerController {
 	public ResponseEntity<RestResponse<PartnerEntity>> getPartner(
 			@RequestParam("partnerId") String partnerId) {
 		return RestUtils.successResponse(partnerService.getPartner(partnerId));
-	}
-
-
-
-	@PostMapping("/publish")
-	public void publishMessage(@RequestParam("message") String message) {
-		//PUSHING MESSAGES TO GCP
-		messagingGateway.sendToPubsub(
-				CommonUtility.stringifyEventForPublish(
-						message,
-						Constant.PARTNER_CREATED_EVENT,
-						Calendar.getInstance().getTime().toString(),
-						"",
-						Constant.PARTNER_SOURCE_ID
-						));
 	}
 }
