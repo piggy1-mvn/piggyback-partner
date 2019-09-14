@@ -13,7 +13,6 @@ public class PartnerOrder {
 	private double deliveryDuration;
 	private int MaxAllowedOrders;
 	private Location orderLocation;
-	private double timestamp;
 	private String initiatorUserId;
 	private String orderStatus;
 	private double optimizationRadius;
