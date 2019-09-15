@@ -34,7 +34,7 @@ public class PartnerController {
 		return RestUtils.successResponse(partnerService.updatePartner(partner));
 	}
 	
-	@GetMapping("/partner/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<RestResponse<PartnerEntity>> getPartner(
 			@PathVariable String partnerId) {
 		return RestUtils.successResponse(partnerService.getPartner(partnerId));
