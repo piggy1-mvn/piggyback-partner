@@ -13,4 +13,5 @@ public interface PartnerService {
 
 	PartnerEntity getPartner(String partnerId);
 
+	Iterable<PartnerEntity> getAllPartner();
 }

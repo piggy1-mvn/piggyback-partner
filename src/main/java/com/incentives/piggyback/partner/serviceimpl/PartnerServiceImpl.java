@@ -34,6 +34,10 @@ public class PartnerServiceImpl implements PartnerService {
 		}
 	}
 
+	public Iterable<PartnerEntity> getAllPartner() {
+		return partnerRepository.findAll();
+	}
+
 	@Override
 	public String deletePartner(String partnerId) {
 		PartnerEntity partner = getPartner(partnerId);
