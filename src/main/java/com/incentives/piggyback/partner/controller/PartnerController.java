@@ -34,13 +34,13 @@ public class PartnerController {
 		return RestUtils.successResponse(partnerService.updatePartner(partner));
 	}
 	
-	@GetMapping("/{id}")
+	@GetMapping
 	public ResponseEntity<RestResponse<PartnerEntity>> getPartner(
-			@PathVariable String partnerId) {
+			@RequestParam("partnerId") String partnerId) {
 		return RestUtils.successResponse(partnerService.getPartner(partnerId));
 	}
 
-	@GetMapping
+	@GetMapping("/")
 	public ResponseEntity<RestResponse<Iterable<PartnerEntity>>> getAllPartner() {
 		return RestUtils.successResponse(partnerService.getAllPartner());
 	}
