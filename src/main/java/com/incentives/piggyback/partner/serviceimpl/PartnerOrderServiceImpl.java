@@ -1,8 +1,12 @@
 package com.incentives.piggyback.partner.serviceimpl;
 
+import java.util.HashMap;
 import java.util.Optional;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.incentives.piggyback.partner.adapter.ObjectAdapter;
@@ -12,6 +16,8 @@ import com.incentives.piggyback.partner.exception.ExceptionResponseCode;
 import com.incentives.piggyback.partner.exception.PiggyException;
 import com.incentives.piggyback.partner.repository.PartnerOrderRepository;
 import com.incentives.piggyback.partner.service.PartnerOrderService;
+
+import static java.lang.reflect.Modifier.TRANSIENT;
 
 @Service
 public class PartnerOrderServiceImpl implements PartnerOrderService {
@@ -32,6 +38,17 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 		} else {
 			throw new PiggyException(ExceptionResponseCode.USER_DATA_NOT_FOUND_IN_RESPONSE);
 		}
+	}
+
+	@Override
+	public ResponseEntity getPartnerOrderType() {
+		HashMap map = new HashMap();
+		map.put("order_type", partnerOrderRepository.getOrderType());
+		final Gson gson = new GsonBuilder()
+				.excludeFieldsWithoutExposeAnnotation()
+				.excludeFieldsWithModifiers(TRANSIENT)
+				.create();
+		return  ResponseEntity.ok(gson.toJson(map));
 	}
 
 	@Override
