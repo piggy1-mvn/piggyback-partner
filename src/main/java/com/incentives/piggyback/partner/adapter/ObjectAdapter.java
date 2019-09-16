@@ -61,7 +61,7 @@ public class ObjectAdapter {
 		orderEntity.setCreatedDate(Calendar.getInstance().getTime());
 		orderEntity.setLastModifiedDate(Calendar.getInstance().getTime());
 		orderEntity.setIsActive(1);
-		return null;
+		return orderEntity;
 	}
 	
 	public static PartnerOrderEntity updatePartnerOrderEntity(
