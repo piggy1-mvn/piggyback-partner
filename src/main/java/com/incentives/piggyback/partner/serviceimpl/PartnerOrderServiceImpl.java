@@ -1,10 +1,14 @@
 package com.incentives.piggyback.partner.serviceimpl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mongodb.client.DistinctIterable;
+import com.mongodb.client.MongoCursor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -43,7 +47,13 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 	@Override
 	public ResponseEntity getPartnerOrderType() {
 		HashMap map = new HashMap();
-		map.put("order_type", partnerOrderRepository.getOrderType());
+		DistinctIterable<String> iterable = partnerOrderRepository.getorderType();
+		MongoCursor<String> cursor = iterable.iterator();
+		List<String> list = new ArrayList<>();
+		while (cursor.hasNext()) {
+			list.add(cursor.next());
+		}
+		map.put("orderType", list);
 		final Gson gson = new GsonBuilder()
 				.excludeFieldsWithoutExposeAnnotation()
 				.excludeFieldsWithModifiers(TRANSIENT)

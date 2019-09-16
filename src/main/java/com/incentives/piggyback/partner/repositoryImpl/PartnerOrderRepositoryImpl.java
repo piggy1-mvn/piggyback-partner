@@ -19,7 +19,7 @@ public class PartnerOrderRepositoryImpl implements PartnerOrderRepositoryCustom 
     }
 
     @Override
-    public DistinctIterable<String> getOrderType() {
+    public DistinctIterable<String> getorderType() {
         return mongoTemplate.getCollection("partnerOrder").distinct("orderType",String.class);
     }
 }
