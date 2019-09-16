@@ -13,4 +13,5 @@ public interface PartnerOrderService {
 
 	PartnerOrderEntity getPartnerOrder(String orderId);
 
+	Iterable<PartnerOrderEntity> getAllPartnerOrder();
 }
