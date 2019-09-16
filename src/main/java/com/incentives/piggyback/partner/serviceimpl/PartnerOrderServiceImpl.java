@@ -44,6 +44,10 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 		}
 	}
 
+	public Iterable<PartnerOrderEntity> getAllPartnerOrder() {
+		return partnerOrderRepository.findAll();
+	}
+
 	@Override
 	public ResponseEntity getPartnerOrderType() {
 		HashMap map = new HashMap();
