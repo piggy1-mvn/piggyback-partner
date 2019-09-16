@@ -46,4 +46,10 @@ public class PartnerOrderController {
 			@RequestParam("orderId") String orderId) {
 		return RestUtils.successResponse(partnerOrderService.getPartnerOrder(orderId));
 	}
+
+	@GetMapping("/")
+	public ResponseEntity<RestResponse<Iterable<PartnerOrderEntity>>> getAllPartnerOrder() {
+		return RestUtils.successResponse(partnerOrderService.getAllPartnerOrder());
+	}
+
 }

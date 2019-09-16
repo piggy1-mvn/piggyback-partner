@@ -34,6 +34,10 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 		}
 	}
 
+	public Iterable<PartnerOrderEntity> getAllPartnerOrder() {
+		return partnerOrderRepository.findAll();
+	}
+
 	@Override
 	public String deletePartnerOrder(String orderId) {
 		PartnerOrderEntity partnerOrder = getPartnerOrder(orderId);
