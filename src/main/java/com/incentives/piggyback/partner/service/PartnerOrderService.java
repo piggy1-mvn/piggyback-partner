@@ -2,6 +2,7 @@ package com.incentives.piggyback.partner.service;
 
 import com.incentives.piggyback.partner.dto.PartnerOrderEntity;
 import com.incentives.piggyback.partner.entity.PartnerOrder;
+import org.springframework.http.ResponseEntity;
 
 public interface PartnerOrderService {
 
@@ -13,5 +14,9 @@ public interface PartnerOrderService {
 
 	PartnerOrderEntity getPartnerOrder(String orderId);
 
+
+	ResponseEntity<String> getPartnerOrderType();
+
 	Iterable<PartnerOrderEntity> getAllPartnerOrder();
+
 }
