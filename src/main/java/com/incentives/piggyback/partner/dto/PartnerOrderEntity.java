@@ -1,7 +1,6 @@
 package com.incentives.piggyback.partner.dto;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,15 +15,14 @@ public class PartnerOrderEntity {
 
 	@Id
 	private String orderId;
-	private String userName;
+	private String partnerId;
 	private String orderType;
-	private double deliveryDuration;
-	private int MaxAllowedOrders;
-	private Location orderLocation;
-	private String initiatorUserId;
 	private String orderStatus;
+	private double optimizationDuration;
+	private Location orderLocation;
+	private int maxOptimizations;
 	private double optimizationRadius;
-	private List<String> userIds;
+	private String initiatorUserId;
 	private Date createdDate;
 	private Date lastModifiedDate;
 	private Integer isActive;
