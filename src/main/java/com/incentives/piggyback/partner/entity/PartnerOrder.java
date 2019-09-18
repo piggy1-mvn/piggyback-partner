@@ -1,20 +1,17 @@
 package com.incentives.piggyback.partner.entity;
 
-import java.util.List;
-
 import lombok.Data;
 
 @Data
 public class PartnerOrder {
 
 	private String orderId;
-	private String userName;
+	private String partnerId;
 	private String orderType;
-	private double deliveryDuration;
-	private int MaxAllowedOrders;
-	private Location orderLocation;
-	private String initiatorUserId;
 	private String orderStatus;
+	private double optimizationDuration;
+	private Location orderLocation;
+	private int maxOptimizations;
 	private double optimizationRadius;
-	private List<String> userIds;
+	private String initiatorUserId;
 }
