@@ -26,7 +26,6 @@ public class PartnerOrderEntity {
 	private Date createdDate;
 	private Date lastModifiedDate;
 	private Integer isActive;
-	private String interestCategory;
 	private String partnerDisplayName;
 	private String partnerRedirectUrl;
 }

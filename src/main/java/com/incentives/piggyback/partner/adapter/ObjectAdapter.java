@@ -62,7 +62,6 @@ public class ObjectAdapter {
 		orderEntity.setOptimizationRadius(partnerOrder.getOptimizationRadius());
 		orderEntity.setCreatedDate(Calendar.getInstance().getTime());
 		orderEntity.setLastModifiedDate(Calendar.getInstance().getTime());
-		orderEntity.setInterestCategory(partnerOrder.getInterestCategory());
 		orderEntity.setPartnerDisplayName(partnerOrder.getPartnerDisplayName());
 		orderEntity.setPartnerRedirectUrl(partnerOrder.getPartnerRedirectUrl());
 		orderEntity.setIsActive(1);
