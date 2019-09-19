@@ -14,4 +14,6 @@ public class PartnerOrder {
 	private int maxOptimizations;
 	private double optimizationRadius;
 	private String initiatorUserId;
+	private String partnerDisplayName;
+	private String partnerRedirectUrl;
 }
