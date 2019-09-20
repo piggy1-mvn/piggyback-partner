@@ -21,6 +21,7 @@ public class ObjectAdapter {
 		partner.setPartnerWebHookAddress(partnerData.getPartnerWebHookAddress());
 		partner.setCreatedDate(Calendar.getInstance().getTime());
 		partner.setLastModifiedDate(Calendar.getInstance().getTime());
+		partner.setUserIds(partnerData.getUserIds());
 		partner.setIsActive(1);
 		return partner;
 	}
@@ -42,6 +43,8 @@ public class ObjectAdapter {
 		if (CommonUtility.isValidString(modifiedPartner.getPartnerWebHookAddress()))
 			currentPartner.setPartnerWebHookAddress(modifiedPartner.getPartnerWebHookAddress());
 
+		currentPartner.setUserIds(modifiedPartner.getUserIds());
+
 		currentPartner.setLastModifiedDate(Calendar.getInstance().getTime());
 		return currentPartner;
 	}
@@ -49,34 +52,35 @@ public class ObjectAdapter {
 	public static PartnerOrderEntity getPartnerOrderEntity(PartnerOrder partnerOrder) {
 		PartnerOrderEntity orderEntity = new PartnerOrderEntity();
 		orderEntity.setOrderId(partnerOrder.getOrderId());
-		orderEntity.setUserName(partnerOrder.getUserName());
+		orderEntity.setPartnerId(partnerOrder.getPartnerId());
 		orderEntity.setOrderType(partnerOrder.getOrderType());
-		orderEntity.setDeliveryDuration(partnerOrder.getDeliveryDuration());
-		orderEntity.setMaxAllowedOrders(partnerOrder.getMaxAllowedOrders());
+		orderEntity.setOptimizationDuration(partnerOrder.getOptimizationDuration());
+		orderEntity.setMaxOptimizations(partnerOrder.getMaxOptimizations());
 		orderEntity.setOrderLocation(partnerOrder.getOrderLocation());
 		orderEntity.setInitiatorUserId(partnerOrder.getInitiatorUserId());
 		orderEntity.setOrderStatus(partnerOrder.getOrderStatus());
 		orderEntity.setOptimizationRadius(partnerOrder.getOptimizationRadius());
-		orderEntity.setUserIds(partnerOrder.getUserIds());
 		orderEntity.setCreatedDate(Calendar.getInstance().getTime());
 		orderEntity.setLastModifiedDate(Calendar.getInstance().getTime());
+		orderEntity.setPartnerDisplayName(partnerOrder.getPartnerDisplayName());
+		orderEntity.setPartnerRedirectUrl(partnerOrder.getPartnerRedirectUrl());
 		orderEntity.setIsActive(1);
 		return orderEntity;
 	}
 	
 	public static PartnerOrderEntity updatePartnerOrderEntity(
 			PartnerOrderEntity currentOrder, PartnerOrder modifiedOrder) {
-		if (CommonUtility.isValidString(modifiedOrder.getUserName()))
-			currentOrder.setUserName(modifiedOrder.getUserName());
+		if (CommonUtility.isValidString(modifiedOrder.getPartnerId()))
+			currentOrder.setPartnerId(modifiedOrder.getPartnerId());
 
 		if (CommonUtility.isValidString(modifiedOrder.getOrderType()))
 			currentOrder.setOrderType(modifiedOrder.getOrderType());
 
-		if (modifiedOrder.getDeliveryDuration() != 0)
-			currentOrder.setDeliveryDuration(modifiedOrder.getDeliveryDuration());
+		if (modifiedOrder.getOptimizationDuration() != 0)
+			currentOrder.setOptimizationDuration(modifiedOrder.getOptimizationDuration());
 
-		if (modifiedOrder.getMaxAllowedOrders() != 0)
-			currentOrder.setMaxAllowedOrders(modifiedOrder.getMaxAllowedOrders());
+		if (modifiedOrder.getMaxOptimizations() != 0)
+			currentOrder.setMaxOptimizations(modifiedOrder.getMaxOptimizations());
 
 		if (!CommonUtility.isNullObject(modifiedOrder.getOrderLocation()))
 			currentOrder.setOrderLocation(modifiedOrder.getOrderLocation());
@@ -89,9 +93,6 @@ public class ObjectAdapter {
 
 		if (modifiedOrder.getOptimizationRadius() != 0)
 			currentOrder.setOptimizationRadius(modifiedOrder.getOptimizationRadius());
-
-		if (CommonUtility.isValidList(modifiedOrder.getUserIds()))
-			currentOrder.setUserIds(modifiedOrder.getUserIds());
 
 		currentOrder.setLastModifiedDate(Calendar.getInstance().getTime());
 		return currentOrder;
