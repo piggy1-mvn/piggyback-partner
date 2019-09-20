@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.incentives.piggyback.partner.util.constants.Preferences;
 import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.MongoCursor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,19 +47,9 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 
 	@Override
 	public ResponseEntity getPartnerOrderType() {
-		HashMap map = new HashMap();
-		DistinctIterable<String> iterable = partnerOrderRepository.getorderType();
-		MongoCursor<String> cursor = iterable.iterator();
-		List<String> list = new ArrayList<>();
-		while (cursor.hasNext()) {
-			list.add(cursor.next());
-		}
-		map.put("orderType", list);
-		final Gson gson = new GsonBuilder()
-				.excludeFieldsWithoutExposeAnnotation()
-				.excludeFieldsWithModifiers(TRANSIENT)
-				.create();
-		return  ResponseEntity.ok(gson.toJson(map));
+		HashMap<String, ArrayList<String>> map = new HashMap<>();
+		map.put("orderType", Preferences.getAllPreferences());
+		return  ResponseEntity.ok(new Gson().toJson(map));
 	}
 
 	@Override
