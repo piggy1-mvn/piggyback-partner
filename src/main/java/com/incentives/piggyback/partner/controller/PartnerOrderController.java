@@ -51,4 +51,11 @@ public class PartnerOrderController {
 	public ResponseEntity<RestResponse<ResponseEntity<String>>> getPartnerOrderType() {
 		return RestUtils.successResponse(partnerOrderService.getPartnerOrderType());
 	}
+
+	@GetMapping("/")
+	public ResponseEntity<RestResponse<Iterable<PartnerOrderEntity>>> getAllPartnerOrder() {
+		return RestUtils.successResponse(partnerOrderService.getAllPartnerOrder());
+	}
+
+
 }

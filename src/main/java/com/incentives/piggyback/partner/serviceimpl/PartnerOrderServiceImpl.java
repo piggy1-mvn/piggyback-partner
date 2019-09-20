@@ -1,12 +1,12 @@
 package com.incentives.piggyback.partner.serviceimpl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
+import com.incentives.piggyback.partner.util.CommonUtility;
+import com.incentives.piggyback.partner.util.constants.Constant;
 import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.MongoCursor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +29,16 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 	@Autowired
 	private PartnerOrderRepository partnerOrderRepository;
 
+	@Autowired
+	private PartnerEventPublisher.PubsubOutboundGateway messagingGateway;
+
+	Gson gson = new Gson();
+
 	@Override
 	public PartnerOrderEntity createPartnerOrder(PartnerOrder partnerOrder) {
-		return partnerOrderRepository.save(ObjectAdapter.getPartnerOrderEntity(partnerOrder));
+		PartnerOrderEntity partnerOrderEntity = partnerOrderRepository.save(ObjectAdapter.getPartnerOrderEntity(partnerOrder));
+		publishPartnerOrder(partnerOrderEntity, Constant.PARTNER_ORDER_CREATED_EVENT);
+		return partnerOrderEntity;
 	}
 
 	@Override
@@ -42,6 +49,10 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 		} else {
 			throw new PiggyException(ExceptionResponseCode.USER_DATA_NOT_FOUND_IN_RESPONSE);
 		}
+	}
+
+	public Iterable<PartnerOrderEntity> getAllPartnerOrder() {
+		return partnerOrderRepository.findAll();
 	}
 
 	@Override
@@ -58,7 +69,7 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 				.excludeFieldsWithoutExposeAnnotation()
 				.excludeFieldsWithModifiers(TRANSIENT)
 				.create();
-		return  ResponseEntity.ok(gson.toJson(map));
+		return ResponseEntity.ok(gson.toJson(map));
 	}
 
 	@Override
@@ -72,7 +83,20 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 	@Override
 	public PartnerOrderEntity updatePartnerOrder(PartnerOrder partnerOrder) {
 		PartnerOrderEntity currentPartnerOrderValue = getPartnerOrder(partnerOrder.getOrderId());
-		return partnerOrderRepository.save(ObjectAdapter.updatePartnerOrderEntity(currentPartnerOrderValue, partnerOrder));
+		PartnerOrderEntity updatedPartnerOrderValue = partnerOrderRepository.save(ObjectAdapter.updatePartnerOrderEntity(currentPartnerOrderValue, partnerOrder));
+		publishPartnerOrder(updatedPartnerOrderValue, Constant.PARTNER_ORDER_UPDATED_EVENT);
+		return updatedPartnerOrderValue;
 	}
 
+	private void publishPartnerOrder(PartnerOrderEntity partnerOrder, String status) {
+		messagingGateway.sendToPubsub(
+				CommonUtility.stringifyEventForPublish(
+						gson.toJson(partnerOrder),
+						status,
+						Calendar.getInstance().getTime().toString(),
+						"",
+						Constant.PARTNER_SOURCE_ID
+				));
+
+	}
 }
