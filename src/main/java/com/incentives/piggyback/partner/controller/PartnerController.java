@@ -10,6 +10,8 @@ import com.incentives.piggyback.partner.service.PartnerService;
 import com.incentives.piggyback.partner.util.RestResponse;
 import com.incentives.piggyback.partner.util.RestUtils;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/partner")
 public class PartnerController {
@@ -41,7 +43,7 @@ public class PartnerController {
 	}
 
 	@GetMapping("/")
-	public ResponseEntity<RestResponse<Iterable<PartnerEntity>>> getAllPartner() {
-		return RestUtils.successResponse(partnerService.getAllPartner());
+	public ResponseEntity<List<PartnerEntity>> getAllPartner() {
+		return ResponseEntity.ok(partnerService.getAllPartner());
 	}
 }

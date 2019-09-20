@@ -1,5 +1,6 @@
 package com.incentives.piggyback.partner.serviceimpl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class PartnerServiceImpl implements PartnerService {
 		}
 	}
 
-	public Iterable<PartnerEntity> getAllPartner() {
+	public List<PartnerEntity> getAllPartner() {
 		return partnerRepository.findAll();
 	}
 
