@@ -54,9 +54,9 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 
 	@Override
 	public ResponseEntity getPartnerOrderType() {
-		HashMap<String, ArrayList<String>> map = new HashMap<>();
-		map.put("orderType", Preferences.getAllPreferences());
-		return  ResponseEntity.ok(gson.toJson(map));
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("orderType", Preferences.values());
+		return  ResponseEntity.ok(map);
 	}
 
 	@Override

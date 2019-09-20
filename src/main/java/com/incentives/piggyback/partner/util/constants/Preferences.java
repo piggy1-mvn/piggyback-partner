@@ -10,13 +10,13 @@ public enum Preferences {
     BOOKS,
     GROCERIES;
 
-    public static ArrayList<String> getAllPreferences() {
-        Preferences[] preferences = Preferences.values();
-        ArrayList<String> stringPreferences = new ArrayList<>();
-        for (Preferences preference : preferences) {
-            stringPreferences.add(preference.toString());
-        }
-        return stringPreferences;
-    }
+//    public static ArrayList<String> getAllPreferences() {
+//        Preferences[] preferences = Preferences.values();
+//        ArrayList<String> stringPreferences = new ArrayList<>();
+//        for (Preferences preference : preferences) {
+//            stringPreferences.add(preference.toString());
+//        }
+//        return stringPreferences;
+//    }
 
 }
