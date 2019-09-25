@@ -21,7 +21,7 @@ spec:
             cpu: "500m"
         imagePullPolicy: Always
         ports:
-        - name: piggyback-partner
+        - name: piggy-partner
           containerPort: 8083
         readinessProbe:
           httpGet:
