@@ -22,9 +22,9 @@ spec:
         imagePullPolicy: Always
         ports:
         - name: piggy-partner
-          containerPort: 8083
+          containerPort: 8085
         readinessProbe:
           httpGet:
             path: /swagger-ui.html
-            port: 8083
+            port: 8085
 status: {}
