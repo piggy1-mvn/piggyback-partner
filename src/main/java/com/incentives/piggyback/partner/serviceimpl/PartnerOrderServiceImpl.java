@@ -1,33 +1,37 @@
 package com.incentives.piggyback.partner.serviceimpl;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Optional;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
-import com.incentives.piggyback.partner.util.CommonUtility;
-import com.incentives.piggyback.partner.util.constants.Constant;
-import com.mongodb.client.DistinctIterable;
-import com.mongodb.client.MongoCursor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
 import com.incentives.piggyback.partner.adapter.ObjectAdapter;
+import com.incentives.piggyback.partner.dto.PartnerEntity;
 import com.incentives.piggyback.partner.dto.PartnerOrderEntity;
 import com.incentives.piggyback.partner.entity.PartnerOrder;
 import com.incentives.piggyback.partner.exception.ExceptionResponseCode;
 import com.incentives.piggyback.partner.exception.PiggyException;
+import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
 import com.incentives.piggyback.partner.repository.PartnerOrderRepository;
 import com.incentives.piggyback.partner.service.PartnerOrderService;
+import com.incentives.piggyback.partner.service.PartnerService;
+import com.incentives.piggyback.partner.util.CommonUtility;
+import com.incentives.piggyback.partner.util.constants.Constant;
+import com.incentives.piggyback.partner.util.constants.Preferences;
 
-import static java.lang.reflect.Modifier.TRANSIENT;
 
 @Service
 public class PartnerOrderServiceImpl implements PartnerOrderService {
 
 	@Autowired
 	private PartnerOrderRepository partnerOrderRepository;
+	
+	@Autowired
+	private PartnerService partnerService;
 
 	@Autowired
 	private PartnerEventPublisher.PubsubOutboundGateway messagingGateway;
@@ -36,6 +40,9 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 
 	@Override
 	public PartnerOrderEntity createPartnerOrder(PartnerOrder partnerOrder) {
+		PartnerEntity partner = partnerService.getPartner(partnerOrder.getPartnerId());
+		partnerOrder.setPartnerDisplayName(partner.getPartnerName());
+		partnerOrder.setPartnerWebHookAddress(partner.getPartnerWebHookAddress());
 		PartnerOrderEntity partnerOrderEntity = partnerOrderRepository.save(ObjectAdapter.getPartnerOrderEntity(partnerOrder));
 		publishPartnerOrder(partnerOrderEntity, Constant.PARTNER_ORDER_CREATED_EVENT);
 		return partnerOrderEntity;
@@ -57,19 +64,9 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 
 	@Override
 	public ResponseEntity getPartnerOrderType() {
-		HashMap map = new HashMap();
-		DistinctIterable<String> iterable = partnerOrderRepository.getorderType();
-		MongoCursor<String> cursor = iterable.iterator();
-		List<String> list = new ArrayList<>();
-		while (cursor.hasNext()) {
-			list.add(cursor.next());
-		}
-		map.put("orderType", list);
-		final Gson gson = new GsonBuilder()
-				.excludeFieldsWithoutExposeAnnotation()
-				.excludeFieldsWithModifiers(TRANSIENT)
-				.create();
-		return ResponseEntity.ok(gson.toJson(map));
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("orderType", Preferences.values());
+		return  ResponseEntity.ok(map);
 	}
 
 	@Override
