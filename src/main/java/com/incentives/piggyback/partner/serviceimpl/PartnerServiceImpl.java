@@ -1,5 +1,6 @@
 package com.incentives.piggyback.partner.serviceimpl;
 
+import java.util.List;
 import java.util.Calendar;
 import java.util.Optional;
 
@@ -46,7 +47,7 @@ public class PartnerServiceImpl implements PartnerService {
 		}
 	}
 
-	public Iterable<PartnerEntity> getAllPartner() {
+	public List<PartnerEntity> getAllPartner() {
 		return partnerRepository.findAll();
 	}
 

@@ -3,12 +3,10 @@ package com.incentives.piggyback.partner.serviceimpl;
 import java.util.*;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.incentives.piggyback.partner.util.constants.Preferences;
 import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
 import com.incentives.piggyback.partner.util.CommonUtility;
 import com.incentives.piggyback.partner.util.constants.Constant;
-import com.mongodb.client.DistinctIterable;
-import com.mongodb.client.MongoCursor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,6 @@ import com.incentives.piggyback.partner.exception.PiggyException;
 import com.incentives.piggyback.partner.repository.PartnerOrderRepository;
 import com.incentives.piggyback.partner.service.PartnerOrderService;
 
-import static java.lang.reflect.Modifier.TRANSIENT;
 
 @Service
 public class PartnerOrderServiceImpl implements PartnerOrderService {
@@ -57,19 +54,9 @@ public class PartnerOrderServiceImpl implements PartnerOrderService {
 
 	@Override
 	public ResponseEntity getPartnerOrderType() {
-		HashMap map = new HashMap();
-		DistinctIterable<String> iterable = partnerOrderRepository.getorderType();
-		MongoCursor<String> cursor = iterable.iterator();
-		List<String> list = new ArrayList<>();
-		while (cursor.hasNext()) {
-			list.add(cursor.next());
-		}
-		map.put("orderType", list);
-		final Gson gson = new GsonBuilder()
-				.excludeFieldsWithoutExposeAnnotation()
-				.excludeFieldsWithModifiers(TRANSIENT)
-				.create();
-		return ResponseEntity.ok(gson.toJson(map));
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("orderType", Preferences.values());
+		return  ResponseEntity.ok(map);
 	}
 
 	@Override
