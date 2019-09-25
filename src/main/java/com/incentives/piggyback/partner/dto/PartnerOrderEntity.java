@@ -18,14 +18,15 @@ public class PartnerOrderEntity {
 	private String partnerId;
 	private String orderType;
 	private String orderStatus;
-	private double optimizationDuration;
+	private Integer optimizationDuration;
 	private Location orderLocation;
-	private int maxOptimizations;
-	private double optimizationRadius;
+	private Integer maxOptimizations;
+	private Integer optimizationRadius;
 	private String initiatorUserId;
 	private Date createdDate;
 	private Date lastModifiedDate;
 	private Integer isActive;
 	private String partnerDisplayName;
 	private String partnerRedirectUrl;
+	private String partnerWebHookAddress;
 }
