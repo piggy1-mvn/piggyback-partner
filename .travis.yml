@@ -6,12 +6,14 @@ cache:
   directories:
   - "$HOME/.m2"
   - "$HOME/.sonar/cache"
+  - "$HOME/google-cloud-sdk"
 
 services:
 - docker
 
 before_install:
-  - openssl aes-256-cbc -k "$DECRYPT_KEY" -in secret-storage.json.enc -out secret-storage.json -d -md sha256
+- openssl aes-256-cbc -k "$DECRYPT_KEY" -in secret-storage.json.enc -out secret-storage.json -d -md sha256
+- openssl aes-256-cbc -k "$DECRYPT_KEY" -in kub-deploy.json.enc -out kub-deploy.json -d -md sha256
 
 install: skip
 
@@ -20,19 +22,20 @@ addons:
     organization: piggyback
 
 script:
-- mvn clean verify sonar:sonar -Dsonar.projectKey=piggy1-mvn_piggyback-partner
-- docker build -t piggy1/partner .
-- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-- docker push piggy1/partner
-- mvn -Pprod clean verify
-- docker build -t partner-prod .
-- if [ $TRAVIS_BRANCH == "master" ] && [ $TRAVIS_EVENT_TYPE == "push" ]; then docker tag partner-prod gcr.io/absolute-text-251105/piggy1-partner:v1; fi
-- if [ $TRAVIS_BRANCH == "master" ] && [ $TRAVIS_EVENT_TYPE == "push" ]; then cat secret-storage.json | docker login -u _json_key --password-stdin https://gcr.io; fi
-- if [ $TRAVIS_BRANCH == "master" ] && [ $TRAVIS_EVENT_TYPE == "push" ]; then docker push gcr.io/absolute-text-251105/piggy1-partner:v1; fi
+- if [ $TRAVIS_BRANCH != "master" ]; then mvn clean verify sonar:sonar -Dsonar.projectKey=piggy1-mvn_piggyback-partner; fi
+- if [ $TRAVIS_BRANCH != "master" ]; then docker build -t piggy1/partner .; fi
+- if [ $TRAVIS_BRANCH != "master" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; fi
+- if [ $TRAVIS_BRANCH != "master" ]; then docker push piggy1/partner; fi 
+- if [ $TRAVIS_BRANCH == "develop" ] && [ $TRAVIS_EVENT_TYPE == "push" ]; then mvn -Pprod clean verify; fi
+- if [ $TRAVIS_BRANCH == "develop" ] && [ $TRAVIS_EVENT_TYPE == "push" ]; then cat secret-storage.json | docker login -u _json_key --password-stdin https://gcr.io; fi
+- if [ $TRAVIS_BRANCH == "develop" ] && [ $TRAVIS_EVENT_TYPE == "push" ]; then chmod 777 deploy_shell_canary.sh; fi
+- if [ $TRAVIS_BRANCH == "develop" ] && [ $TRAVIS_EVENT_TYPE == "push" ]; then ./deploy_shell_canary.sh; fi
+- if [ $TRAVIS_BRANCH == "master" ] && [ $TRAVIS_EVENT_TYPE == "push" ]; then chmod 777 deploy_shell_prod.sh; fi
+- if [ $TRAVIS_BRANCH == "master" ] && [ $TRAVIS_EVENT_TYPE == "push" ]; then ./deploy_shell_prod.sh; fi
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 
 env:
   global:
-    secure: ObkGH5XbFrMv2tF1nN2KEy1Yan7eqXJc62UliDvASZicIuW1cjcNrx8DYBNJirssYbDc1KY5WiZGqeofRDRmjSUUADWoAt0QdVgA9GhMoDdmMoE16vcjfE6FXGye9ydCLGhhNkG0Tkv4LX5hhG1IqGA9yjQhmXYKbojcdV6o0bcLWaJYP+9sumZym5DxQb6viOaMUdR9OX8nQEiDEFYgawOpWNlzs9pVnJoA41S1NZ65dnR4TNkCw5BXkmykvH7HXZO8dQf3wOnp+rGCmXaYjGbzwk8pPm+RW5MIV1zWy89Ygtn9gXJXpK2evzEVXxthvoZ7Hrj+ij7dovkbQ8xiOro0FxvUTm1Vgh7I15ksmPMzmpjRUc/U6v0mB5FM8rFQGC0GABlZOcduyC/vAwFOpa+gbj89CV7+sz59UWhLpbNVg0ovkxSJTOkZrm+nvftodpC5xw3lsYftqlOYlGNOp4w2fNq6UZNTjRdlJfWOCQtR8+j//7h2ST1+9DiK5hCtdEAPa/oE+xWA/xueAc2FN1DPyJxPlZCRbaX8uUYbwGhlOm6tmKkqUjZYXsPbgHhxPaO65BRBD+pBnPFj5gzm42m6I+QHAhIYr+ghQ3YbN0dkIx3JrPOsuxz6wE2nbyyGruGAqJ2FP9Qto1a+jd2I7e/nHkssFQK/yblo+J0WvSc=
+  - CLOUDSDK_CORE_DISABLE_PROMPTS=1
