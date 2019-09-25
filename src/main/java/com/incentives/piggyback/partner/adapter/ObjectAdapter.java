@@ -64,6 +64,7 @@ public class ObjectAdapter {
 		orderEntity.setLastModifiedDate(Calendar.getInstance().getTime());
 		orderEntity.setPartnerDisplayName(partnerOrder.getPartnerDisplayName());
 		orderEntity.setPartnerRedirectUrl(partnerOrder.getPartnerRedirectUrl());
+		orderEntity.setPartnerWebHookAddress(partnerOrder.getPartnerWebHookAddress());
 		orderEntity.setIsActive(1);
 		return orderEntity;
 	}
