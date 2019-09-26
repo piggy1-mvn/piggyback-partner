@@ -12,12 +12,12 @@ spec:
         app: piggyback-partner
         env: production
     spec:
-     volumes:
+      volumes:
       - name: google-cloud-key
         secret:
           secretName: pubsub-key
       containers:
-      - image: gcr.io/absolute-text-251105/piggy1-partner:v5
+      - image: gcr.io/absolute-text-251105/piggy1-partner:v6
         name: piggyback-prod-runner-partner
         volumeMounts:
         - name: google-cloud-key
