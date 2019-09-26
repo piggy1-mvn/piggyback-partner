@@ -13,12 +13,12 @@ spec:
         env: production
     spec:
       containers:
-      - image: gcr.io/absolute-text-251105/piggy1-partner:v2
+      - image: gcr.io/absolute-text-251105/piggy1-partner:v3
         name: piggyback-prod-runner-partner
         resources:
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: "384Mi"
+            cpu: "300m"
         imagePullPolicy: Always
         ports:
         - name: piggy-partner
