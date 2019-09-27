@@ -68,7 +68,7 @@ public class ObjectAdapter {
 		orderEntity.setIsActive(1);
 		return orderEntity;
 	}
-	
+
 	public static PartnerOrderEntity updatePartnerOrderEntity(
 			PartnerOrderEntity currentOrder, PartnerOrder modifiedOrder) {
 		if (CommonUtility.isValidString(modifiedOrder.getPartnerId()))
@@ -86,7 +86,7 @@ public class ObjectAdapter {
 		if (!CommonUtility.isNullObject(modifiedOrder.getOrderLocation()))
 			currentOrder.setOrderLocation(modifiedOrder.getOrderLocation());
 
-		if (CommonUtility.isValidString(modifiedOrder.getInitiatorUserId()))
+		if (CommonUtility.isValidLong(modifiedOrder.getInitiatorUserId()))
 			currentOrder.setInitiatorUserId(modifiedOrder.getInitiatorUserId());
 
 		if (CommonUtility.isValidString(modifiedOrder.getOrderStatus()))

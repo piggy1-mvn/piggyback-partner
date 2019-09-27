@@ -22,7 +22,7 @@ public class PartnerOrderEntity {
 	private Location orderLocation;
 	private Integer maxOptimizations;
 	private Integer optimizationRadius;
-	private String initiatorUserId;
+	private Long initiatorUserId;
 	private Date createdDate;
 	private Date lastModifiedDate;
 	private Integer isActive;
