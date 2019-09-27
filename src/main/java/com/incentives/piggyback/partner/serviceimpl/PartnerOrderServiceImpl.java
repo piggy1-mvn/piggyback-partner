@@ -23,7 +23,6 @@ import com.incentives.piggyback.partner.util.CommonUtility;
 import com.incentives.piggyback.partner.util.constants.Constant;
 import com.incentives.piggyback.partner.util.constants.Preferences;
 
-
 @Service
 public class PartnerOrderServiceImpl implements PartnerOrderService {
 
