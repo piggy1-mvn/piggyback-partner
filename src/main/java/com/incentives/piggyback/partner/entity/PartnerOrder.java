@@ -13,7 +13,7 @@ public class PartnerOrder {
 	private Location orderLocation;
 	private Integer maxOptimizations;
 	private Integer optimizationRadius;
-	private String initiatorUserId;
+	private Long initiatorUserId;
 	private String partnerDisplayName;
 	private String partnerRedirectUrl;
 	private String partnerWebHookAddress;
