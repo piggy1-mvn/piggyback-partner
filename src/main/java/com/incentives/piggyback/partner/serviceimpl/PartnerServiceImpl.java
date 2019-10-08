@@ -8,7 +8,10 @@ import com.google.gson.Gson;
 import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
 import com.incentives.piggyback.partner.util.CommonUtility;
 import com.incentives.piggyback.partner.util.constants.Constant;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import com.incentives.piggyback.partner.adapter.ObjectAdapter;
@@ -18,7 +21,10 @@ import com.incentives.piggyback.partner.exception.ExceptionResponseCode;
 import com.incentives.piggyback.partner.exception.PiggyException;
 import com.incentives.piggyback.partner.repository.PartnerRepository;
 import com.incentives.piggyback.partner.service.PartnerService;
+import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
+@Slf4j
 @Service
 public class PartnerServiceImpl implements PartnerService {
 
@@ -28,13 +34,23 @@ public class PartnerServiceImpl implements PartnerService {
 	@Autowired
 	private PartnerEventPublisher.PubsubOutboundGateway messagingGateway;
 
+	@Autowired
+	Environment env;
+
+	@Autowired
+	private RestTemplate restTemplate;
+
 	Gson gson = new Gson();
 
 	@Override
-	public PartnerEntity createPartner(Partner partner) {
+	public PartnerEntity createPartner(Partner partner,HttpServletRequest request){
+		if(isAuthorized(request.getHeader("Authorization"))){
 		PartnerEntity partnerEntity = partnerRepository.save(ObjectAdapter.getPartnerEntity(partner));
 		publishPartner(partnerEntity, Constant.PARTNER_CREATED_EVENT);
 		return partnerEntity;
+	    }else {
+			throw new PiggyException(ExceptionResponseCode.USER_DATA_NOT_FOUND_IN_RESPONSE);
+		}
 	}
 
 	@Override
@@ -60,11 +76,15 @@ public class PartnerServiceImpl implements PartnerService {
 	}
 
 	@Override
-	public PartnerEntity updatePartner(Partner partner) {
-		PartnerEntity currentPartnerValue = getPartner(partner.getPartnerId());
-		PartnerEntity partnerEntity = partnerRepository.save(ObjectAdapter.updatePartnerEntity(currentPartnerValue, partner));
-		publishPartner(partnerEntity, Constant.PARTNER_UPDATED_EVENT);
-		return partnerEntity;
+	public PartnerEntity updatePartner(Partner partner, HttpServletRequest request) {
+		if(isAuthorized(request.getHeader("Authorization"))) {
+			PartnerEntity currentPartnerValue = getPartner(partner.getPartnerId());
+			PartnerEntity partnerEntity = partnerRepository.save(ObjectAdapter.updatePartnerEntity(currentPartnerValue, partner));
+			publishPartner(partnerEntity, Constant.PARTNER_UPDATED_EVENT);
+			return partnerEntity;
+		}else {
+			throw new PiggyException(ExceptionResponseCode.USER_DATA_NOT_FOUND_IN_RESPONSE);
+		}
 	}
 
 	private void publishPartner(PartnerEntity partner, String status) {
@@ -76,5 +96,25 @@ public class PartnerServiceImpl implements PartnerService {
 						"",
 						Constant.PARTNER_SOURCE_ID
 				));
+	}
+
+	private boolean isAuthorized(String accessToken) {
+		log.info("Partner Service: User token validation from user service");
+		String url = env.getProperty("users.api.userValid");
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+		headers.set("Authorization", accessToken);
+		HttpEntity<?> entity = new HttpEntity<>(headers);
+		ResponseEntity<Integer> response =
+				restTemplate.exchange(url, HttpMethod.HEAD,
+						entity,Integer.class);
+		if (CommonUtility.isNullObject(response.getStatusCode())){
+			throw new PiggyException("User not authorized to create partner");
+		}else if(response.getStatusCodeValue()==200){
+			return true;
+		}
+		else
+			return false;
+
 	}
 }
