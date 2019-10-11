@@ -2,6 +2,9 @@ package com.incentives.piggyback.partner;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class PartnerApplication {
@@ -10,4 +13,9 @@ public class PartnerApplication {
 		SpringApplication.run(PartnerApplication.class, args);
 	}
 
+
+	@Bean
+	public RestTemplate restTemplate(RestTemplateBuilder builder) {
+		return builder.build();
+	}
 }
