@@ -135,7 +135,7 @@ public class PartnerServiceImpl implements PartnerService {
 		headers.set("Authorization", "Bearer "+ generateLoginToken());
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
 				.queryParam("id", usersId);
-		HttpEntity<?> entity = new HttpEntity<>(userPartnerIdRequest,headers);
+		HttpEntity<?> entity = new HttpEntity<>(headers);
 		ResponseEntity<UserData> response =
 				restTemplate.exchange(builder.toUriString(), HttpMethod.PATCH,
 						entity, UserData.class);
