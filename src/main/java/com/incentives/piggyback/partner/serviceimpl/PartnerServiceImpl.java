@@ -6,13 +6,11 @@ import java.util.Optional;
 
 import com.google.gson.Gson;
 import com.incentives.piggyback.partner.entity.*;
-import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
+import com.incentives.piggyback.partner.publisher.KafkaMessageProducer;
 import com.incentives.piggyback.partner.util.CommonUtility;
 import com.incentives.piggyback.partner.util.constants.Constant;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import com.incentives.piggyback.partner.exception.PiggyException;
 import com.incentives.piggyback.partner.repository.PartnerRepository;
 import com.incentives.piggyback.partner.service.PartnerService;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 @Slf4j
@@ -35,15 +32,18 @@ public class PartnerServiceImpl implements PartnerService {
 	private PartnerRepository partnerRepository;
 
 	@Autowired
-	private PartnerEventPublisher.PubsubOutboundGateway messagingGateway;
-
-	@Autowired
 	Environment env;
 
 	@Autowired
 	private RestTemplate restTemplate;
 
+	private final KafkaMessageProducer kafkaMessageProducer;
+
 	Gson gson = new Gson();
+
+	public PartnerServiceImpl(KafkaMessageProducer kafkaMessageProducer) {
+		this.kafkaMessageProducer = kafkaMessageProducer;
+	}
 
 	@Override
 	public PartnerEntity createPartner(Partner partner,HttpServletRequest request){
@@ -94,14 +94,15 @@ public class PartnerServiceImpl implements PartnerService {
 
 
 	private void publishPartner(PartnerEntity partner, String status) {
-		messagingGateway.sendToPubsub(
+		kafkaMessageProducer.send(
 				CommonUtility.stringifyEventForPublish(
 						gson.toJson(partner),
 						status,
 						Calendar.getInstance().getTime().toString(),
 						"",
 						Constant.PARTNER_SOURCE_ID
-				));
+				)
+		);
 	}
 
 	private boolean isAuthorized(String accessToken) {
