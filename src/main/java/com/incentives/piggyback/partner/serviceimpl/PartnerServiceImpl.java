@@ -91,8 +91,7 @@ public class PartnerServiceImpl implements PartnerService {
 		}
 	}
 
-	private void updatePartnerIdForUser(PartnerEntity partnerEntity) {
-	}
+
 
 	private void publishPartner(PartnerEntity partner, String status) {
 		messagingGateway.sendToPubsub(
@@ -135,7 +134,7 @@ public class PartnerServiceImpl implements PartnerService {
 		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
 		headers.set("Authorization", "Bearer "+ generateLoginToken());
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-				.queryParam("users", usersId);
+				.queryParam("id", usersId);
 		HttpEntity<?> entity = new HttpEntity<>(userPartnerIdRequest,headers);
 		ResponseEntity<UserData> response =
 				restTemplate.exchange(builder.toUriString(), HttpMethod.PATCH,
