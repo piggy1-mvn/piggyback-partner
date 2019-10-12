@@ -5,23 +5,26 @@ import java.util.Calendar;
 import java.util.Optional;
 
 import com.google.gson.Gson;
+import com.incentives.piggyback.partner.entity.*;
 import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
 import com.incentives.piggyback.partner.util.CommonUtility;
 import com.incentives.piggyback.partner.util.constants.Constant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import com.incentives.piggyback.partner.adapter.ObjectAdapter;
 import com.incentives.piggyback.partner.dto.PartnerEntity;
-import com.incentives.piggyback.partner.entity.Partner;
 import com.incentives.piggyback.partner.exception.ExceptionResponseCode;
 import com.incentives.piggyback.partner.exception.PiggyException;
 import com.incentives.piggyback.partner.repository.PartnerRepository;
 import com.incentives.piggyback.partner.service.PartnerService;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 @Slf4j
@@ -80,11 +83,15 @@ public class PartnerServiceImpl implements PartnerService {
 		if(isAuthorized(request.getHeader("Authorization"))) {
 			PartnerEntity currentPartnerValue = getPartner(partner.getPartnerId());
 			PartnerEntity partnerEntity = partnerRepository.save(ObjectAdapter.updatePartnerEntity(currentPartnerValue, partner));
+			updatePartnerIdForUser(Long.valueOf(partnerEntity.getUserIds().get(0)),partnerEntity.getPartnerId());
 			publishPartner(partnerEntity, Constant.PARTNER_UPDATED_EVENT);
 			return partnerEntity;
 		}else {
 			throw new PiggyException(ExceptionResponseCode.USER_DATA_NOT_FOUND_IN_RESPONSE);
 		}
+	}
+
+	private void updatePartnerIdForUser(PartnerEntity partnerEntity) {
 	}
 
 	private void publishPartner(PartnerEntity partner, String status) {
@@ -116,5 +123,45 @@ public class PartnerServiceImpl implements PartnerService {
 		else
 			return false;
 
+	}
+
+	public void updatePartnerIdForUser(Long usersId, String partnerId) {
+		log.info("Partner Service: Started Updating User with partner Id");
+		String url = env.getProperty("users.api.usersWithParentId");
+		UserPartnerIdRequest userPartnerIdRequest = new UserPartnerIdRequest();
+		userPartnerIdRequest.setId(usersId);
+		userPartnerIdRequest.setUser_partner_id(partnerId);
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+		headers.set("Authorization", "Bearer "+ generateLoginToken());
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+				.queryParam("users", usersId);
+		HttpEntity<?> entity = new HttpEntity<>(userPartnerIdRequest,headers);
+		ResponseEntity<UserData> response =
+				restTemplate.exchange(builder.toUriString(), HttpMethod.PATCH,
+						entity, UserData.class);
+		if (CommonUtility.isNullObject(response.getBody()))
+			throw new PiggyException("No users with desired interest found!");
+
+		log.info("Partner Service: User update with partner Id Completed");
+	}
+
+	private String generateLoginToken() {
+		String url = env.getProperty("user.api.login");
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+		HttpEntity<?> entity = new HttpEntity<>(setUserCredentials(), headers);
+		ResponseEntity<JwtResponse> response =
+				restTemplate.exchange(url, HttpMethod.POST,
+						entity, JwtResponse.class);
+		return response.getBody().getJwttoken();
+	}
+
+
+	private UserCredential setUserCredentials() {
+		UserCredential userCredential = new UserCredential();
+		userCredential.setEmail(env.getProperty("user.login.email"));
+		userCredential.setUser_password(env.getProperty("user.login.password"));
+		return userCredential;
 	}
 }
