@@ -83,7 +83,7 @@ public class PartnerServiceImpl implements PartnerService {
 		if(isAuthorized(request.getHeader("Authorization"))) {
 			PartnerEntity currentPartnerValue = getPartner(partner.getPartnerId());
 			PartnerEntity partnerEntity = partnerRepository.save(ObjectAdapter.updatePartnerEntity(currentPartnerValue, partner));
-			updatePartnerIdForUser(Long.valueOf(partnerEntity.getUserIds().get(0)),partnerEntity.getPartnerId());
+//			updatePartnerIdForUser(Long.valueOf(partnerEntity.getUserIds().get(0)),partnerEntity.getPartnerId());
 			publishPartner(partnerEntity, Constant.PARTNER_UPDATED_EVENT);
 			return partnerEntity;
 		}else {
@@ -124,43 +124,4 @@ public class PartnerServiceImpl implements PartnerService {
 
 	}
 
-	public void updatePartnerIdForUser(Long usersId, String partnerId) {
-		log.info("Partner Service: Started Updating User with partner Id");
-		String url = env.getProperty("users.api.usersWithParentId");
-		UserPartnerIdRequest userPartnerIdRequest = new UserPartnerIdRequest();
-		userPartnerIdRequest.setId(usersId);
-		userPartnerIdRequest.setUser_partner_id(partnerId);
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-		headers.set("Authorization", "Bearer "+ generateLoginToken());
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-				.queryParam("id", usersId);
-		HttpEntity<?> entity = new HttpEntity<>(headers);
-		ResponseEntity<UserData> response =
-				restTemplate.exchange(builder.toUriString(), HttpMethod.PATCH,
-						entity, UserData.class);
-		if (CommonUtility.isNullObject(response.getBody()))
-			throw new PiggyException("No users with desired interest found!");
-
-		log.info("Partner Service: User update with partner Id Completed");
-	}
-
-	private String generateLoginToken() {
-		String url = env.getProperty("user.api.login");
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-		HttpEntity<?> entity = new HttpEntity<>(setUserCredentials(), headers);
-		ResponseEntity<JwtResponse> response =
-				restTemplate.exchange(url, HttpMethod.POST,
-						entity, JwtResponse.class);
-		return response.getBody().getJwttoken();
-	}
-
-
-	private UserCredential setUserCredentials() {
-		UserCredential userCredential = new UserCredential();
-		userCredential.setEmail(env.getProperty("user.login.email"));
-		userCredential.setUser_password(env.getProperty("user.login.password"));
-		return userCredential;
-	}
 }
