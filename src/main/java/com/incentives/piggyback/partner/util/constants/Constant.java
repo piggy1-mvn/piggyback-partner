@@ -6,7 +6,7 @@ public interface Constant {
     String PARTNER_SOURCE_ID = "6";
     String PARTNER_CREATED_EVENT = "Partner Events Created";
     String PARTNER_UPDATED_EVENT = "Partner Events Updated";
-
+    String USER_PARTNER_MAPPING = "User Partner Mapping Event";
     String PARTNER_DEACTIVATED_EVENT = "Partner Events Deactivated";
 
     Integer SUCCESS_STATUS = 200;

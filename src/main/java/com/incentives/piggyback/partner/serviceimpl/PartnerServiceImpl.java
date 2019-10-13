@@ -81,8 +81,12 @@ public class PartnerServiceImpl implements PartnerService {
 	@Override
 	public PartnerEntity updatePartner(Partner partner, HttpServletRequest request) {
 		if(isAuthorized(request.getHeader("Authorization"))) {
+			UserPartnerDto userPartnerDto = new UserPartnerDto();
 			PartnerEntity currentPartnerValue = getPartner(partner.getPartnerId());
 			PartnerEntity partnerEntity = partnerRepository.save(ObjectAdapter.updatePartnerEntity(currentPartnerValue, partner));
+			userPartnerDto.setPartnerId(partner.getPartnerId());
+			userPartnerDto.setUserId(Long.valueOf(partner.getUserIds().get(0)));
+			publishPartner(userPartnerDto,Constant.USER_PARTNER_MAPPING);
 //			updatePartnerIdForUser(Long.valueOf(partnerEntity.getUserIds().get(0)),partnerEntity.getPartnerId());
 			publishPartner(partnerEntity, Constant.PARTNER_UPDATED_EVENT);
 			return partnerEntity;
@@ -97,6 +101,18 @@ public class PartnerServiceImpl implements PartnerService {
 		kafkaMessageProducer.send(
 				CommonUtility.stringifyEventForPublish(
 						gson.toJson(partner),
+						status,
+						Calendar.getInstance().getTime().toString(),
+						"",
+						Constant.PARTNER_SOURCE_ID
+				)
+		);
+	}
+
+	private void publishPartner(UserPartnerDto userPartnerDto, String status) {
+		kafkaMessageProducer.send(
+				CommonUtility.stringifyEventForPublish(
+						gson.toJson(userPartnerDto),
 						status,
 						Calendar.getInstance().getTime().toString(),
 						"",
