@@ -5,7 +5,8 @@ import java.util.Calendar;
 import java.util.Optional;
 
 import com.google.gson.Gson;
-import com.incentives.piggyback.partner.publisher.PartnerEventPublisher;
+import com.incentives.piggyback.partner.entity.*;
+import com.incentives.piggyback.partner.publisher.KafkaMessageProducer;
 import com.incentives.piggyback.partner.util.CommonUtility;
 import com.incentives.piggyback.partner.util.constants.Constant;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import com.incentives.piggyback.partner.adapter.ObjectAdapter;
 import com.incentives.piggyback.partner.dto.PartnerEntity;
-import com.incentives.piggyback.partner.entity.Partner;
 import com.incentives.piggyback.partner.exception.ExceptionResponseCode;
 import com.incentives.piggyback.partner.exception.PiggyException;
 import com.incentives.piggyback.partner.repository.PartnerRepository;
@@ -32,15 +32,18 @@ public class PartnerServiceImpl implements PartnerService {
 	private PartnerRepository partnerRepository;
 
 	@Autowired
-	private PartnerEventPublisher.PubsubOutboundGateway messagingGateway;
-
-	@Autowired
 	Environment env;
 
 	@Autowired
 	private RestTemplate restTemplate;
 
+	private final KafkaMessageProducer kafkaMessageProducer;
+
 	Gson gson = new Gson();
+
+	public PartnerServiceImpl(KafkaMessageProducer kafkaMessageProducer) {
+		this.kafkaMessageProducer = kafkaMessageProducer;
+	}
 
 	@Override
 	public PartnerEntity createPartner(Partner partner,HttpServletRequest request){
@@ -78,8 +81,13 @@ public class PartnerServiceImpl implements PartnerService {
 	@Override
 	public PartnerEntity updatePartner(Partner partner, HttpServletRequest request) {
 		if(isAuthorized(request.getHeader("Authorization"))) {
+			UserPartnerDto userPartnerDto = new UserPartnerDto();
 			PartnerEntity currentPartnerValue = getPartner(partner.getPartnerId());
 			PartnerEntity partnerEntity = partnerRepository.save(ObjectAdapter.updatePartnerEntity(currentPartnerValue, partner));
+			userPartnerDto.setPartnerId(partner.getPartnerId());
+			userPartnerDto.setUserId(Long.valueOf(partner.getUserIds().get(0)));
+			publishPartner(userPartnerDto,Constant.USER_PARTNER_MAPPING);
+//			updatePartnerIdForUser(Long.valueOf(partnerEntity.getUserIds().get(0)),partnerEntity.getPartnerId());
 			publishPartner(partnerEntity, Constant.PARTNER_UPDATED_EVENT);
 			return partnerEntity;
 		}else {
@@ -87,15 +95,30 @@ public class PartnerServiceImpl implements PartnerService {
 		}
 	}
 
+
+
 	private void publishPartner(PartnerEntity partner, String status) {
-		messagingGateway.sendToPubsub(
+		kafkaMessageProducer.send(
 				CommonUtility.stringifyEventForPublish(
 						gson.toJson(partner),
 						status,
 						Calendar.getInstance().getTime().toString(),
 						"",
 						Constant.PARTNER_SOURCE_ID
-				));
+				)
+		);
+	}
+
+	private void publishPartner(UserPartnerDto userPartnerDto, String status) {
+		kafkaMessageProducer.send(
+				CommonUtility.stringifyEventForPublish(
+						gson.toJson(userPartnerDto),
+						status,
+						Calendar.getInstance().getTime().toString(),
+						"",
+						Constant.PARTNER_SOURCE_ID
+				)
+		);
 	}
 
 	private boolean isAuthorized(String accessToken) {
@@ -117,4 +140,5 @@ public class PartnerServiceImpl implements PartnerService {
 			return false;
 
 	}
+
 }
